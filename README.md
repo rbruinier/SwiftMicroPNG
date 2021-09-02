@@ -8,7 +8,7 @@ Some of the work is based on this implementation: https://github.com/jamesbowman
 
 ## Example usage
 
-```
+```swift
 let width = UInt32(512)
 let height = UInt32(512)
 
