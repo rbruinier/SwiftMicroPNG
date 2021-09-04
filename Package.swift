@@ -17,6 +17,9 @@ let package = Package(
             dependencies: []),
         .testTarget(
             name: "MicroPNGTests",
-            dependencies: ["MicroPNG"]),
+            dependencies: ["MicroPNG"],
+            resources: [
+                .copy("Data"),
+            ])
     ]
 )

@@ -3,6 +3,9 @@ public final class MicroPNG {
         case invalidDataSize
     }
 
+    public init() {
+    }
+    
     /// 32 ARGB Data to uncompressed 24 bit RGB PNG
     public func encodeRGBUncompressed(data: [UInt32], width: UInt32, height: UInt32) throws -> [UInt8] {
         return try encodeUncompressed(data: data, width: width, height: height, format: .rgb)
@@ -23,7 +26,7 @@ public final class MicroPNG {
         var pngData = PNGData(width: width, height: height, format: format)
 
         pngData.appendIHDRChunk()
-        pngData.appendRGBIDATChunk(data: data)
+        pngData.appendIDATChunk(data: data)
         pngData.appendIENDChunk()
 
         return pngData.bytes
@@ -92,9 +95,20 @@ public final class MicroPNG {
             endChunk()
         }
 
-        fileprivate mutating func appendRGBIDATChunk(data: [UInt32]) {
-            let bytesPerLine = 1 + format.bytesPerPixel * width
-            let dataChunkSize = 2 + height * bytesPerLine + 4
+        fileprivate mutating func appendIDATChunk(data: [UInt32]) {
+            let dataBytesPerBlock =
+                1 // filter
+                + (format.bytesPerPixel * width)
+
+            let bytesPerBlock =
+                1 // last block indicator
+                + 4 // 2 * block size
+                + dataBytesPerBlock
+
+            let dataChunkSize: UInt32 =
+                2 // deflate header
+                + (height * bytesPerBlock)
+                + 4 // adler32
 
             startChunk(code: "IDAT", size: dataChunkSize)
 
@@ -104,10 +118,12 @@ public final class MicroPNG {
 
             var index = 0
             for y in 0 ..< height {
-                appendByte((y + 1) == height ? 1 : 0) // 1 if last line, 0 otherwise
+                appendByte((y + 1) == height
+                           ? 1
+                           : 0) // 1 if last line, 0 otherwise
 
-                appendLittleEndianUInt16(UInt16(bytesPerLine))
-                appendLittleEndianUInt16(~UInt16(bytesPerLine))
+                appendLittleEndianUInt16(UInt16(dataBytesPerBlock))
+                appendLittleEndianUInt16(~UInt16(dataBytesPerBlock))
 
                 appendByteAndUpdateAdler(0)
 
