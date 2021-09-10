@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.2] - 2021-09-10
+### Changed
+- Required Swift tools version is now 5.3 instead of 5.4. 
+
 ## [0.1.1] - 2021-09-10
 ### Changed
 - Moved CRC32 & Adler32 logic to dedicated types.
