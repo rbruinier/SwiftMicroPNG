@@ -55,10 +55,8 @@ public final class MicroPNG {
 
         fileprivate var bytes: [UInt8] = []
 
-        private var crc32: UInt32 = 0
-
-        private var adler1: UInt32 = 1
-        private var adler2: UInt32 = 0
+        private var crc32 = CRC32()
+        private var adler32 = Adler32()
 
         fileprivate init(width: UInt32, height: UInt32, format: Format) {
             self.width = width
@@ -178,20 +176,20 @@ public final class MicroPNG {
 
             appendBigEndianUInt32(size)
 
-            crc32 = 0xFFFFFFFF;
+            crc32.reset(to: 0xFFFFFFFF)
 
             appendBytes(asciiCharacters)
         }
 
         private mutating func endChunk() {
-            appendBigEndianUInt32(0xFFFFFFFF ^ crc32)
+            appendBigEndianUInt32(0xFFFFFFFF ^ crc32.value)
         }
 
         @inline(__always)
         private mutating func appendByte(_ data: UInt8) {
             bytes.append(data)
 
-            updateCRC(with: data)
+            crc32.update(with: data)
         }
 
         private mutating func appendBytes(_ data: [UInt8]) {
@@ -213,33 +211,14 @@ public final class MicroPNG {
         }
 
         private mutating func appendAdler() {
-            appendBigEndianUInt32((adler2 << 16) + adler1)
+            appendBigEndianUInt32(adler32.result)
         }
 
         @inline(__always)
         private mutating func appendByteAndUpdateAdler(_ data: UInt8) {
             appendByte(data)
 
-            adler1 = (adler1 + UInt32(data)) % 65521
-            adler2 = (adler2 + adler1) % 65521
-        }
-
-        @inline(__always)
-        private mutating func updateCRC(with data: UInt8) {
-            let crcTable: [UInt32] = [
-                0x00000000, 0x1db71064, 0x3b6e20c8, 0x26d930ac,
-                0x76dc4190, 0x6b6b51f4, 0x4db26158, 0x5005713c,
-                0xedb88320, 0xf00f9344, 0xd6d6a3e8, 0xcb61b38c,
-                0x9b64c2b0, 0x86d3d2d4, 0xa00ae278, 0xbdbdf21c
-            ]
-
-            var tableIndex = UInt8(crc32 & 0xFF) ^ data
-
-            crc32 = crcTable[Int(tableIndex) & 0xF] ^ (crc32 >> 4);
-
-            tableIndex = UInt8(crc32 & 0xFF) ^ (data >> 4);
-
-            crc32 = crcTable[Int(tableIndex) & 0xF] ^ (crc32 >> 4);
+            adler32.update(with: data)
         }
     }
 }
