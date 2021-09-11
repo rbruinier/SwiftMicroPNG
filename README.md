@@ -1,5 +1,9 @@
 # MicroPNG
 
+[![Swift](https://github.com/rbruinier/SwiftMicroPNG/actions/workflows/swift.yml/badge.svg)](https://github.com/rbruinier/SwiftMicroPNG/actions/workflows/swift.yml)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Frbruinier%2FSwiftMicroPNG%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/rbruinier/SwiftMicroPNG)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Frbruinier%2FSwiftMicroPNG%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/rbruinier/SwiftMicroPNG)
+
 This package currently offers a very minimal PNG encoder for uncompressed RGB and RGBA PNG files.
 
 It does not rely on any frameworks and should work on all Swift supported platforms.
